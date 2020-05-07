@@ -16,12 +16,14 @@ var Logger *logger
 const (
 	AppLog  = "app"
 	HttpLog = "http"
+	DbLog   = "database"
 )
 
 func init() {
 	Logger = GetLogger()
 	Logger.Set(HttpLog, log.New(Logger.CreateLogFileWriter("access.log"), "[http] ", log.LstdFlags))
 	Logger.Set(AppLog, log.New(Logger.CreateLogFileWriter("app.log", os.Stdout), "[app] ", log.LstdFlags))
+	Logger.Set(DbLog, log.New(Logger.CreateLogFileWriter("database.log", os.Stdout), "[database] ", log.LstdFlags))
 }
 
 func GetLogger() (l *logger) {
@@ -56,8 +58,7 @@ func (l *logger) CreateLogFileWriter(filename string, writers ...io.Writer) io.W
 		log.Panic(err)
 	}
 
-	writers = append(writers, file)
-	writer := io.MultiWriter(writers...)
+	writer := io.MultiWriter(append(writers, file)...)
 
 	return writer
 }

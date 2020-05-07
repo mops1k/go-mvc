@@ -68,6 +68,10 @@ func (c *config) GetStringSlice(key string) []string {
 	return c.reader.GetStringSlice(key)
 }
 
+func (c *config) GetStringMap(key string) map[string]interface{} {
+	return c.reader.GetStringMap(key)
+}
+
 func (c *config) GetDuration(key string) time.Duration {
 	return c.reader.GetDuration(key)
 }
