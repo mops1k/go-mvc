@@ -26,6 +26,13 @@ func GetRouting() *Routing {
 	return r
 }
 
+func (r *Routing) HandleControllers() {
+	for _, controller := range Controllers.All() {
+		methods := service.Config.GetStringSlice(controller.Name() + ".methods")
+		r.addController(controller, methods...)
+	}
+}
+
 func (r *Routing) addController(c Controller, methods ...string) {
 	methods = r.setDefaultMethods(methods)
 	pathName, path := c.Name(), service.Config.GetString(c.Name()+".path")
@@ -57,11 +64,4 @@ func (r *Routing) setDefaultMethods(methods []string) []string {
 	}
 
 	return methods
-}
-
-func (r *Routing) HandleControllers() {
-	for _, controller := range Controllers.All() {
-		methods := service.Config.GetStringSlice(controller.Name() + ".methods")
-		r.addController(controller, methods...)
-	}
 }
