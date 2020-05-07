@@ -1,10 +1,12 @@
 package mvc
 
 import (
+	"log"
 	"reflect"
 
 	"github.com/CloudyKit/jet"
 
+	"github.com/mops1k/go-mvc/cli"
 	"github.com/mops1k/go-mvc/http"
 	"github.com/mops1k/go-mvc/service"
 )
@@ -14,9 +16,9 @@ func init() {
 }
 
 func templatePathFunc(a jet.Arguments) reflect.Value {
-	a.RequireNumOfArguments("path", 1, -1)
 	var args []string
-	var result string
+	a.RequireNumOfArguments("path", 1, -1)
+
 	name := a.Get(0)
 	if a.NumOfArguments() > 1 {
 		for i := 1; i < a.NumOfArguments(); i++ {
@@ -26,10 +28,8 @@ func templatePathFunc(a jet.Arguments) reflect.Value {
 
 	url, err := http.Routing.Mux().Get(name.String()).URL(args...)
 	if err != nil {
-		return reflect.ValueOf(err.Error())
+		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
 	}
 
-	result = url.String()
-
-	return reflect.ValueOf(result)
+	return reflect.ValueOf(url.String())
 }
