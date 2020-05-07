@@ -1,8 +1,12 @@
 package http
 
 import (
-	"github.com/arthurkushman/pgo"
+	"log"
 
+	"github.com/arthurkushman/pgo"
+	"github.com/jinzhu/gorm"
+
+	"github.com/mops1k/go-mvc/cli"
 	"github.com/mops1k/go-mvc/service"
 )
 
@@ -31,6 +35,15 @@ func (bc *BaseController) Render(filename string, vars map[string]interface{}) s
 
 func (bc *BaseController) RenderString(content string, vars map[string]interface{}) string {
 	return service.Template.RenderString(content, vars)
+}
+
+func (bc *BaseController) GetManager(name interface{}) *gorm.DB {
+	manager, err := service.Manager.Get(name)
+	if err != nil {
+		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
+	}
+
+	return manager
 }
 
 func (cc *controllerCollection) Add(c Controller) *controllerCollection {
