@@ -16,7 +16,7 @@ type Server struct {
 	srv         *http.Server
 	middlewares []Middleware
 	logger      *log.Logger
-	routing     *Routing
+	routing     *routing
 }
 
 func GetServer(host string, port int, log *log.Logger) (s *Server) {
@@ -25,7 +25,7 @@ func GetServer(host string, port int, log *log.Logger) (s *Server) {
 		host:     host,
 		timeouts: make(map[string]uint16),
 		logger:   log,
-		routing:  GetRouting(),
+		routing:  Routing,
 	}
 	s.Middleware(&LoggingMiddleware{})
 
