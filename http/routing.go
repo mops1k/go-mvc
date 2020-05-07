@@ -33,6 +33,10 @@ func (r *Routing) addController(c Controller, methods ...string) {
 		var context = &Context{response: writer, request: request, statusCode: http.StatusOK}
 		content := c.Action(context)
 
+		if _, exists := context.headers["Content-Type"]; !exists {
+			context.headers["Content-Type"] = "text/html"
+		}
+
 		if context.headers != nil {
 			for name, value := range context.headers {
 				writer.Header().Add(name, value)
