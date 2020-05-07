@@ -32,7 +32,8 @@ func init() {
 }
 
 func Run() {
-	appLog.Println("Application has started at " + srv.String())
+	defer service.Manager.Close()
+	appLog.Printf("Application has started at %s\n", srv)
 
 	if err := srv.ListenAndServe(); err != nil {
 		appLog.Println(err)

@@ -68,3 +68,12 @@ func (m *manager) AddModels(name string, models ...interface{}) {
 
 	manager.AutoMigrate(models...)
 }
+
+func (m *manager) Close() {
+	for name, instance := range m.instances {
+		err := instance.Close()
+		if err != nil {
+			cli.Logger.Get(cli.DbLog).(*log.Logger).Printf(`[database: %s] %s`, name, err)
+		}
+	}
+}
