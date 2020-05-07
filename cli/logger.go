@@ -14,9 +14,10 @@ type logger struct {
 var Logger *logger
 
 const (
-	AppLog  = "app"
-	HttpLog = "http"
-	DbLog   = "database"
+	AppLog   = "app"
+	ErrorLog = "error"
+	HttpLog  = "http"
+	DbLog    = "database"
 )
 
 func init() {
@@ -24,6 +25,7 @@ func init() {
 	Logger.Set(HttpLog, log.New(Logger.CreateLogFileWriter("access.log"), "[http] ", log.LstdFlags))
 	Logger.Set(AppLog, log.New(Logger.CreateLogFileWriter("app.log", os.Stdout), "[app] ", log.LstdFlags))
 	Logger.Set(DbLog, log.New(Logger.CreateLogFileWriter("database.log"), "[database] ", log.LstdFlags))
+	Logger.Set(ErrorLog, log.New(Logger.CreateLogFileWriter("error.log", os.Stderr), "[database] ", log.LstdFlags))
 }
 
 func GetLogger() (l *logger) {

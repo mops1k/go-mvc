@@ -37,7 +37,7 @@ func (t *template) render(template *jet.Template, vars map[string]interface{}) s
 	var w bytes.Buffer
 	err := template.Execute(&w, varMap, nil)
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
 
 	return w.String()
@@ -46,7 +46,7 @@ func (t *template) render(template *jet.Template, vars map[string]interface{}) s
 func (t *template) RenderTemplate(filename string, vars map[string]interface{}) string {
 	template, err := t.view.GetTemplate(filename)
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
 
 	return t.render(template, vars)
@@ -55,7 +55,7 @@ func (t *template) RenderTemplate(filename string, vars map[string]interface{}) 
 func (t *template) RenderString(content string, vars map[string]interface{}) string {
 	template, err := t.view.Parse(pgo.Md5(content), content)
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
 
 	return t.render(template, vars)

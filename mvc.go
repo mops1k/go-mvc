@@ -22,7 +22,7 @@ func init() {
 	srv = http.GetServer(
 		service.Config.GetString("server.host"),
 		service.Config.GetInt("server.port"),
-		cli.Logger.Get(cli.HttpLog).(*log.Logger),
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger),
 	)
 	srv.SetTimeouts(
 		cast.ToUint16(service.Config.GetInt("server.timeout.read")),

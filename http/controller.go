@@ -40,7 +40,7 @@ func (bc *BaseController) RenderString(content string, vars map[string]interface
 func (bc *BaseController) GetManager(name interface{}) *gorm.DB {
 	manager, err := service.Manager.Get(name)
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
 
 	return manager

@@ -28,7 +28,7 @@ func templatePathFunc(a jet.Arguments) reflect.Value {
 
 	url, err := http.Routing.Mux().Get(name.String()).URL(args...)
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
 
 	return reflect.ValueOf(url.String())

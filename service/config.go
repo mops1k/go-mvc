@@ -27,7 +27,7 @@ func init() {
 
 	files, err := ioutil.ReadDir(dirName)
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Fatal(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Fatal(err)
 	}
 
 	for _, file := range files {
@@ -42,7 +42,7 @@ func init() {
 		Config.reader.SetConfigFile(dirName + file.Name())
 		err = Config.reader.MergeInConfig()
 		if err != nil {
-			cli.Logger.Get(cli.AppLog).(*log.Logger).Fatal(err)
+			cli.Logger.Get(cli.ErrorLog).(*log.Logger).Fatal(err)
 		}
 	}
 }
@@ -81,11 +81,11 @@ func (c *config) AddFile(path string) {
 	c.reader.SetConfigFile(path)
 	err := c.reader.MergeInConfig()
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Fatal(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Fatal(err)
 	}
 
 	err = c.reader.MergeInConfig()
 	if err != nil {
-		cli.Logger.Get(cli.AppLog).(*log.Logger).Fatal(err)
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Fatal(err)
 	}
 }
