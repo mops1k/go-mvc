@@ -57,6 +57,8 @@ func (m *manager) set(name string) {
 	if err != nil {
 		cli.Logger.Get(cli.DbLog).(*log.Logger).Panic(err)
 	}
+	m.instances[name].SetLogger(cli.Logger.Get(cli.DbLog).(*log.Logger))
+	m.instances[name].Debug()
 }
 
 func (m *manager) AddModels(name string, models ...interface{}) {

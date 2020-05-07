@@ -23,7 +23,7 @@ func init() {
 	Logger = GetLogger()
 	Logger.Set(HttpLog, log.New(Logger.CreateLogFileWriter("access.log"), "[http] ", log.LstdFlags))
 	Logger.Set(AppLog, log.New(Logger.CreateLogFileWriter("app.log", os.Stdout), "[app] ", log.LstdFlags))
-	Logger.Set(DbLog, log.New(Logger.CreateLogFileWriter("database.log", os.Stdout), "[database] ", log.LstdFlags))
+	Logger.Set(DbLog, log.New(Logger.CreateLogFileWriter("database.log"), "[database] ", log.LstdFlags))
 }
 
 func GetLogger() (l *logger) {
