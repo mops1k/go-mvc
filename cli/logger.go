@@ -20,8 +20,8 @@ const (
 
 func init() {
 	Logger = GetLogger()
-	Logger.Set(HttpLog, log.New(Logger.CreateLogFile("access.log"), "[http] ", log.LstdFlags))
-	Logger.Set(AppLog, log.New(os.Stdout, "[app] ", log.LstdFlags))
+	Logger.Set(HttpLog, log.New(Logger.CreateLogFileWriter("access.log"), "[http] ", log.LstdFlags))
+	Logger.Set(AppLog, log.New(Logger.CreateLogFileWriter("app.log", os.Stdout), "[app] ", log.LstdFlags))
 }
 
 func GetLogger() (l *logger) {
@@ -45,7 +45,7 @@ func (l *logger) Set(key string, instance interface{}) {
 	l.loggers[key] = instance
 }
 
-func (l *logger) CreateLogFile(filename string) io.Writer {
+func (l *logger) CreateLogFileWriter(filename string, writers ...io.Writer) io.Writer {
 	err := os.MkdirAll("./var/log/", 0666)
 	if err != nil {
 		log.Panic(err)
@@ -56,7 +56,8 @@ func (l *logger) CreateLogFile(filename string) io.Writer {
 		log.Panic(err)
 	}
 
-	writer := io.MultiWriter(file)
+	writers = append(writers, file)
+	writer := io.MultiWriter(writers...)
 
 	return writer
 }

@@ -16,5 +16,5 @@ type LoggingMiddleware struct {
 }
 
 func (lm *LoggingMiddleware) Handler(next http.Handler) http.Handler {
-	return handlers.CombinedLoggingHandler(cli.Logger.CreateLogFile("access.log"), next)
+	return handlers.CombinedLoggingHandler(cli.Logger.CreateLogFileWriter("access.log"), next)
 }
