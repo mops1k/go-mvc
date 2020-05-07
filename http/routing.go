@@ -73,8 +73,10 @@ func (r *routing) setDefaultMethods(methods []string) []string {
 
 func (r *routing) Path(name string, args map[string]string) (string, error) {
 	var opts []string
-	for name, value := range args {
-		opts = append(opts, name, value)
+	if args != nil {
+		for name, value := range args {
+			opts = append(opts, name, value)
+		}
 	}
 
 	url, err := r.mux.Get(name).URL(opts...)
