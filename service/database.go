@@ -24,7 +24,7 @@ var Manager *manager
 func init() {
 	databases := Config.GetStringMap("database")
 	Manager = &manager{instances: make(map[string]*gorm.DB)}
-	for name, _ := range databases {
+	for name := range databases {
 		Manager.set(name)
 	}
 }
@@ -41,7 +41,7 @@ func (m *manager) Get(name interface{}) (*gorm.DB, error) {
 	}
 
 	if m.instances[cast.ToString(name)] == nil {
-		return nil, errors.New(fmt.Sprintf(`manager for "%s" are not found`, name))
+		return nil, fmt.Errorf(`manager for "%s" are not found`, name)
 	}
 
 	return m.instances[cast.ToString(name)], nil
