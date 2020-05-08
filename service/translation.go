@@ -29,8 +29,7 @@ func init() {
 		dictionary:     make(map[language.Tag]map[string]string),
 	}
 	dirname := "./translations/"
-	if err := os.Mkdir(dirname, 0666); os.IsExist(err) {
-	}
+	_ = os.Mkdir(dirname, 0666)
 
 	files, err := ioutil.ReadDir(dirname)
 	if err != nil {
