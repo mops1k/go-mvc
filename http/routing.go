@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
+	"strings"
 
 	"github.com/gorilla/mux"
 
 	"github.com/mops1k/go-mvc/cli"
-	"github.com/mops1k/go-mvc/service"
 )
 
 type routing struct {
@@ -29,8 +30,7 @@ func init() {
 
 func (r *routing) HandleControllers() {
 	for _, controller := range Controllers.All() {
-		methods := service.Config.GetStringSlice(controller.Name() + ".methods")
-		r.addController(controller, methods...)
+		r.addController(controller)
 	}
 }
 
@@ -38,11 +38,11 @@ func (r *routing) Mux() *mux.Router {
 	return r.mux
 }
 
-func (r *routing) addController(c Controller, methods ...string) {
-	methods = r.setDefaultMethods(methods)
-	pathName, path := c.Name(), service.Config.GetString(c.Name()+".path")
+func (r *routing) addController(c Controller) {
+	path, pathName, methods := r.getPathInfoForController(c)
 	r.mux.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
 		var context = &Context{response: writer, request: request, statusCode: http.StatusOK, headers: make(map[string]string)}
+
 		content := c.Action(context)
 
 		if _, exists := context.headers["Content-Type"]; !exists {
@@ -83,4 +83,29 @@ func (r *routing) Path(name string, args map[string]string) (string, error) {
 	}
 
 	return url.String(), nil
+}
+
+func (r *routing) getPathInfoForController(c Controller) (path string, name string, methods []string) {
+	v := reflect.ValueOf(c)
+	i := reflect.Indirect(v)
+	s := i.Type()
+	field, ok := s.FieldByName("PathInfo")
+	if !ok {
+		return
+	}
+	path, ok = field.Tag.Lookup("path")
+	if !ok {
+		return
+	}
+	name, ok = field.Tag.Lookup("name")
+	if !ok {
+		return
+	}
+	methodsString, ok := field.Tag.Lookup("methods")
+	if !ok {
+		return
+	}
+	methods = strings.Split(methodsString, ",")
+
+	return
 }
