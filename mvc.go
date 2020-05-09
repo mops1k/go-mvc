@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cast"
 
 	"github.com/mops1k/go-mvc/cli"
@@ -17,6 +18,9 @@ var (
 )
 
 func init() {
+	logo := figure.NewFigure("go-mvc", "isometric1", true)
+	logo.Print()
+
 	cli.Logger.Set(cli.AppLog, log.New(os.Stdout, "[app] ", log.LstdFlags))
 	appLog = cli.Logger.Get(cli.AppLog).(*log.Logger)
 	srv = http.GetServer(

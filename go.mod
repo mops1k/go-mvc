@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53 // indirect
 	github.com/CloudyKit/jet v2.1.2+incompatible
+    github.com/common-nighthawk/go-figure v0.0.0-20190529165535-67e0ed34491a
 	github.com/arthurkushman/pgo v0.0.0-20200406094630-0e7858f78767
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
