@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/spf13/cast"
 
 	"github.com/mops1k/go-mvc/cli"
 )
@@ -40,7 +41,16 @@ func (r *routing) Mux() *mux.Router {
 
 func (r *routing) addController(c Controller) {
 	path, pathName, methods := r.getPathInfoForController(c)
-	r.mux.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
+	if path == nil {
+		cli.Logger.Get(cli.AppLog).(*log.Logger).Printf(`[%s] register controller skipping: field "PathInfo" tag "path" is missing`, reflect.TypeOf(c).String())
+		return
+	}
+
+	if methods == nil {
+		methods = r.setDefaultMethods(methods)
+	}
+
+	route := r.mux.HandleFunc(cast.ToString(path), func(writer http.ResponseWriter, request *http.Request) {
 		var context = &Context{response: writer, request: request, statusCode: http.StatusOK, headers: make(map[string]string)}
 
 		content := c.Action(context)
@@ -60,7 +70,11 @@ func (r *routing) addController(c Controller) {
 		if err != nil {
 			cli.Logger.Get(cli.HttpLog).(*log.Logger).Fatal(err)
 		}
-	}).Methods(methods...).Name(pathName)
+	}).Methods(methods...)
+
+	if pathName != nil {
+		route.Name(cast.ToString(pathName))
+	}
 }
 
 func (r *routing) setDefaultMethods(methods []string) []string {
@@ -85,7 +99,7 @@ func (r *routing) Path(name string, args map[string]string) (string, error) {
 	return url.String(), nil
 }
 
-func (r *routing) getPathInfoForController(c Controller) (path string, name string, methods []string) {
+func (r *routing) getPathInfoForController(c Controller) (path interface{}, name interface{}, methods []string) {
 	v := reflect.ValueOf(c)
 	i := reflect.Indirect(v)
 	s := i.Type()
@@ -97,10 +111,7 @@ func (r *routing) getPathInfoForController(c Controller) (path string, name stri
 	if !ok {
 		return
 	}
-	name, ok = field.Tag.Lookup("name")
-	if !ok {
-		return
-	}
+	name, _ = field.Tag.Lookup("name")
 	methodsString, ok := field.Tag.Lookup("methods")
 	if !ok {
 		return
