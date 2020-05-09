@@ -7,6 +7,8 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/handlers"
 )
 
 type Server struct {
@@ -41,7 +43,7 @@ func (s *Server) ListenAndServe() error {
 
 	s.srv = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", s.host, s.port),
-		Handler:      s.routing.mux,
+		Handler:      handlers.RecoveryHandler()(s.routing.mux),
 		ReadTimeout:  s.getTimeout("read"),
 		WriteTimeout: s.getTimeout("write"),
 		IdleTimeout:  s.getTimeout("idle"),
