@@ -19,6 +19,7 @@ type Server struct {
 	middlewares []Middleware
 	logger      *log.Logger
 	routing     *routing
+	handler     http.Handler
 }
 
 func GetServer(host string, port int, log *log.Logger) (s *Server) {
@@ -28,7 +29,9 @@ func GetServer(host string, port int, log *log.Logger) (s *Server) {
 		timeouts: make(map[string]uint16),
 		logger:   log,
 		routing:  Routing,
+		handler:  handlers.RecoveryHandler()(Routing.mux),
 	}
+
 	s.Middleware(&LoggingMiddleware{})
 
 	return
@@ -43,7 +46,7 @@ func (s *Server) ListenAndServe() error {
 
 	s.srv = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", s.host, s.port),
-		Handler:      handlers.RecoveryHandler()(s.routing.mux),
+		Handler:      s.handler,
 		ReadTimeout:  s.getTimeout("read"),
 		WriteTimeout: s.getTimeout("write"),
 		IdleTimeout:  s.getTimeout("idle"),
@@ -72,6 +75,16 @@ func (s *Server) SetTimeouts(read uint16, write uint16, idle uint16) *Server {
 	return s
 }
 
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.srv.Shutdown(ctx)
+}
+
+func (s *Server) SetHandler(h http.Handler) *Server {
+	s.handler = h
+
+	return s
+}
+
 func (s *Server) String() string {
 	return fmt.Sprintf("http://%s:%d", s.host, s.port)
 }
@@ -83,8 +96,4 @@ func (s *Server) getTimeout(name string) time.Duration {
 	}
 
 	return time.Duration(value) * time.Second
-}
-
-func (s *Server) Shutdown(ctx context.Context) error {
-	return s.srv.Shutdown(ctx)
 }

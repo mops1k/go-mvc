@@ -2,6 +2,7 @@ package mvc
 
 import (
 	"log"
+	netHttp "net/http"
 	"os"
 
 	"github.com/common-nighthawk/go-figure"
@@ -46,4 +47,8 @@ func Run() {
 
 func HttpMiddleware(middleware http.Middleware) {
 	srv.Middleware(middleware)
+}
+
+func HttpHandler(h netHttp.Handler) {
+	srv.SetHandler(h)
 }
