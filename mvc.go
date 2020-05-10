@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/common-nighthawk/go-figure"
+	"github.com/gookit/color"
 	"github.com/spf13/cast"
 
 	"github.com/mops1k/go-mvc/cli"
@@ -60,7 +61,7 @@ func Run() {
 
 		var c string
 		for {
-			fmt.Print("> ")
+			color.Green.Print("> ")
 			_, _ = fmt.Scanln(&c)
 			parser := command.NewParser()
 			parser.Parse(c)
