@@ -1,7 +1,9 @@
 package http
 
 import (
+	"errors"
 	"log"
+	"net/http"
 
 	"github.com/arthurkushman/pgo"
 	"github.com/jinzhu/gorm"
@@ -11,8 +13,9 @@ import (
 )
 
 type Controller interface {
-	Action(c *Context) string
+	Action(c *Context) (string, error)
 	Name() string
+	Error(w http.ResponseWriter, err error, code int)
 }
 
 type BaseController struct {
@@ -35,6 +38,16 @@ func (bc *BaseController) Render(filename string, vars map[string]interface{}) s
 
 func (bc *BaseController) RenderString(content string, vars map[string]interface{}) string {
 	return service.Template.RenderString(content, vars)
+}
+
+func (bc *BaseController) Error(w http.ResponseWriter, err error, code int) {
+	http.Error(w, err.Error(), code)
+}
+
+func (bc *BaseController) NotFound(ctx *Context, err string) (string, error) {
+	ctx.statusCode = http.StatusNotFound
+
+	return "", errors.New(err)
 }
 
 func (bc *BaseController) GetManager(name interface{}) *gorm.DB {

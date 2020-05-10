@@ -51,9 +51,21 @@ func (r *routing) addController(c Controller) {
 	}
 
 	route := r.mux.HandleFunc(cast.ToString(path), func(writer http.ResponseWriter, request *http.Request) {
-		var context = &Context{response: writer, request: request, statusCode: http.StatusOK, headers: make(map[string]string)}
+		var context = &Context{response: writer, request: request, headers: make(map[string]string)}
 
-		content := c.Action(context)
+		content, err := c.Action(context)
+		if err != nil {
+			if context.statusCode == 0 {
+				context.statusCode = http.StatusInternalServerError
+			}
+
+			c.Error(writer, err, context.statusCode)
+			return
+		}
+
+		if context.statusCode == 0 {
+			context.statusCode = http.StatusOK
+		}
 
 		if _, exists := context.headers["Content-Type"]; !exists {
 			context.headers["Content-Type"] = "text/html"
@@ -66,7 +78,7 @@ func (r *routing) addController(c Controller) {
 		}
 		writer.WriteHeader(context.statusCode)
 
-		_, err := fmt.Fprint(writer, content)
+		_, err = fmt.Fprint(writer, content)
 		if err != nil {
 			cli.Logger.Get(cli.HttpLog).(*log.Logger).Fatal(err)
 		}
