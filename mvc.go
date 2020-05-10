@@ -2,6 +2,7 @@ package mvc
 
 import (
 	"context"
+	"fmt"
 	"log"
 	netHttp "net/http"
 	"os"
@@ -13,8 +14,10 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/mops1k/go-mvc/cli"
+	cmd "github.com/mops1k/go-mvc/cli/command"
 	"github.com/mops1k/go-mvc/http"
 	"github.com/mops1k/go-mvc/service"
+	"github.com/mops1k/go-mvc/service/command"
 )
 
 var (
@@ -44,8 +47,27 @@ func Run() {
 	appLog.Printf("Application has started at %s\n", srv)
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			appLog.Println(err)
+		go func() {
+			if err := srv.ListenAndServe(); err != nil {
+				appLog.Println(err)
+			}
+		}()
+
+		cc := service.Commands
+		cc.Add(&cmd.RoutingCommand{})
+
+		var c string
+		for {
+			fmt.Print("> ")
+			_, _ = fmt.Scanln(&c)
+			parser := command.NewParser()
+			parser.Parse(c)
+			if cc.Has(parser.Ctx().Command()) {
+				c := cc.Get(parser.Ctx().Command())
+				c.Action(parser.Ctx())
+			} else {
+				appLog.Printf(`Unknown command "%s".`, parser.Ctx().Command())
+			}
 		}
 	}()
 

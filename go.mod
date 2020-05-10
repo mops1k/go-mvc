@@ -13,4 +13,7 @@ require (
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/viper v1.6.3
 	golang.org/x/text v0.3.0
+	github.com/jedib0t/go-pretty v4.3.0+incompatible
+	github.com/go-openapi/strfmt v0.19.5 // indirect
+	github.com/mattn/go-runewidth v0.0.9 // indirect
 )
