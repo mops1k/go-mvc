@@ -1,9 +1,13 @@
 package mvc
 
 import (
+	"context"
 	"log"
 	netHttp "net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cast"
@@ -37,12 +41,28 @@ func init() {
 }
 
 func Run() {
-	defer service.Manager.Close()
 	appLog.Printf("Application has started at %s\n", srv)
 
-	if err := srv.ListenAndServe(); err != nil {
-		appLog.Println(err)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			appLog.Println(err)
+		}
+	}()
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-done
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		appLog.Println("Stopping application services")
+		service.Manager.Close()
+		cancel()
+	}()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		appLog.Fatalf("Application Stopping Failed:%+v", err)
 	}
+	appLog.Println("Application has stopped")
 }
 
 func HttpMiddleware(middleware http.Middleware) {
