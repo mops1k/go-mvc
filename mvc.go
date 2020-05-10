@@ -28,7 +28,7 @@ var (
 
 func init() {
 	logo := figure.NewFigure("go-mvc", "isometric1", true)
-	logo.Print()
+	color.Green.Println(logo.String())
 
 	cli.Logger.Set(cli.AppLog, log.New(os.Stdout, "[app] ", log.LstdFlags))
 	appLog = cli.Logger.Get(cli.AppLog).(*log.Logger)
