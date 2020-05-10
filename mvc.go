@@ -53,8 +53,10 @@ func Run() {
 			}
 		}()
 
+		appLog.Println(`Type "help" for list available commands`)
 		cc := service.Commands
 		cc.Add(&cmd.RoutingCommand{})
+		cc.Add(&cmd.HelpCommand{})
 
 		var c string
 		for {
