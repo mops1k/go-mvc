@@ -21,12 +21,9 @@ var Routing *routing
 
 func init() {
 	Routing = &routing{mux: mux.NewRouter()}
-	staticDirName := "static"
-	Routing.mux.PathPrefix("/" + staticDirName).
-		Handler(http.StripPrefix(
-			"/"+staticDirName+"/",
-			http.FileServer(http.Dir("./"+staticDirName+"/")))).Name(staticDirName)
-
+	staticDirName := "public"
+	Routing.mux.PathPrefix(`/{[\w\d\S]+\.[\w]{2,5}}`).
+		Handler(http.FileServer(http.Dir("./" + staticDirName + "/"))).Name(staticDirName)
 }
 
 func (r *routing) HandleControllers() {
@@ -51,7 +48,12 @@ func (r *routing) addController(c Controller) {
 	}
 
 	route := r.mux.HandleFunc(cast.ToString(path), func(writer http.ResponseWriter, request *http.Request) {
-		var context = &Context{response: writer, request: request, headers: make(map[string]string)}
+		var context = &Context{
+			response: writer,
+			request:  request,
+			headers:  make(map[string]string),
+			vars:     mux.Vars(request),
+		}
 
 		content, err := c.Action(context)
 		if err != nil {

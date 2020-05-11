@@ -1,12 +1,26 @@
 package http
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+
+	"github.com/mops1k/go-mvc/cli"
+)
 
 type Context struct {
 	response   http.ResponseWriter
 	request    *http.Request
 	statusCode int
 	headers    map[string]string
+	vars       map[string]string
+}
+
+func (c *Context) Get(key string) string {
+	if _, exists := c.vars[key]; !exists {
+		cli.Logger.Get(cli.AppLog).(*log.Logger).Printf(`Path var "%s" does no exists`, key)
+	}
+
+	return c.vars[key]
 }
 
 func (c *Context) Response() http.ResponseWriter {
