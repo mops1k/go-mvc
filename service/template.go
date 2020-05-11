@@ -4,38 +4,61 @@ import (
 	"bytes"
 	"log"
 
-	"github.com/CloudyKit/jet"
-	"github.com/arthurkushman/pgo"
+	"github.com/tyler-sommer/stick"
+	"github.com/tyler-sommer/stick/twig"
 
 	"github.com/mops1k/go-mvc/cli"
 )
 
 type template struct {
-	view *jet.Set
+	env     *stick.Env
+	globals map[string]interface{}
 }
 
 var Template *template
 
 func init() {
-	Template = &template{view: jet.NewHTMLSet(`./templates`)}
+	Template = &template{env: stick.New(stick.NewFilesystemLoader("./templates"))}
+	Template.AddExtension(twig.NewAutoEscapeExtension())
 }
 
-func (t *template) AddFunc(key string, fn jet.Func) {
-	t.view.AddGlobalFunc(key, fn)
+func (t *template) AddFunc(key string, handler stick.Func) {
+	t.env.Functions[key] = handler
+}
+
+func (t *template) AddFilter(key string, handler stick.Filter) {
+	t.env.Filters[key] = handler
+}
+
+func (t *template) UseFuncAsFilter(key string, handler stick.Func) {
+	fn := func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
+		arguments := append([]stick.Value{val}, args...)
+
+		return handler(ctx, arguments...)
+	}
+
+	t.env.Filters[key] = fn
 }
 
 func (t *template) AddGlobal(key string, value interface{}) {
-	t.view.AddGlobal(key, value)
+	t.globals[key] = value
 }
 
-func (t *template) render(template *jet.Template, vars map[string]interface{}) string {
-	varMap := make(jet.VarMap)
-	for name, value := range vars {
-		varMap.Set(name, value)
+func (t *template) AddExtension(e stick.Extension) {
+	err := t.env.Register(e)
+	if err != nil {
+		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
+	}
+}
+
+func (t *template) render(content string, vars map[string]interface{}) string {
+	args := make(map[string]stick.Value)
+	for key, value := range vars {
+		args[key] = value
 	}
 
 	var w bytes.Buffer
-	err := template.Execute(&w, varMap, nil)
+	err := t.env.Execute(content, &w, args)
 	if err != nil {
 		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
@@ -44,19 +67,15 @@ func (t *template) render(template *jet.Template, vars map[string]interface{}) s
 }
 
 func (t *template) RenderTemplate(filename string, vars map[string]interface{}) string {
-	template, err := t.view.GetTemplate(filename)
-	if err != nil {
-		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
-	}
-
-	return t.render(template, vars)
+	return t.render(filename, vars)
 }
 
 func (t *template) RenderString(content string, vars map[string]interface{}) string {
-	template, err := t.view.Parse(pgo.Md5(content), content)
-	if err != nil {
-		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
-	}
+	prevLoader := t.env.Loader
 
-	return t.render(template, vars)
+	t.env.Loader = &stick.StringLoader{}
+	result := t.render(content, vars)
+	t.env.Loader = prevLoader
+
+	return result
 }

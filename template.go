@@ -1,10 +1,10 @@
 package mvc
 
 import (
+	"fmt"
 	"log"
-	"reflect"
 
-	"github.com/CloudyKit/jet"
+	"github.com/tyler-sommer/stick"
 	"golang.org/x/text/language"
 
 	"github.com/mops1k/go-mvc/cli"
@@ -14,60 +14,83 @@ import (
 
 func init() {
 	service.Template.AddFunc("path", templatePathFunc)
-	service.Template.AddFunc("translate", templateTransFunc)
+	service.Template.AddFunc("trans", templateTransFunc)
+	service.Template.UseFuncAsFilter("path", templatePathFunc)
+	service.Template.UseFuncAsFilter("trans", templateTransFunc)
 }
 
-func templatePathFunc(a jet.Arguments) reflect.Value {
-	a.RequireNumOfArguments("path", 1, -1)
-	var args []string
+func templatePathFunc(ctx stick.Context, args ...stick.Value) stick.Value {
+	var values []string
+	path := stick.CoerceString(args[0])
+	for i := len(args); i < 3; i++ {
+		args = append(args, stick.Value(nil))
+	}
 
-	name := a.Get(0)
-	if a.NumOfArguments() > 1 {
-		for i := 1; i < a.NumOfArguments(); i++ {
-			args = append(args, a.Get(i).String())
+	if args[1] != nil && stick.IsMap(args[1]) {
+		_, err := stick.Iterate(args[1], func(k, v stick.Value, l stick.Loop) (brk bool, err error) {
+			values = append(values, stick.CoerceString(k), stick.CoerceString(v))
+
+			return true, nil
+		})
+
+		if err != nil {
+			cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 		}
 	}
 
-	url, err := http.Routing.Mux().Get(name.String()).URL(args...)
+	route := http.Routing.Mux().GetRoute(path)
+
+	url, err := route.URL(values...)
 	if err != nil {
 		cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 	}
 
-	return reflect.ValueOf(url.String())
-}
+	if args[2] != nil && stick.IsMap(args[2]) {
+		_, err := stick.Iterate(args[2], func(k, v stick.Value, l stick.Loop) (brk bool, err error) {
+			url.RawQuery += fmt.Sprintf("%s=%s", stick.CoerceString(k), stick.CoerceString(v))
+			if !l.Last {
+				url.RawQuery += "&"
+			}
 
-func templateTransFunc(a jet.Arguments) reflect.Value {
-	a.RequireNumOfArguments("translate", 1, -1)
-	key := a.Get(0).String()
-	var result string
-	switch a.NumOfArguments() {
-	case 1:
-		result = service.Translation.Trans(key, nil)
-	case 2:
-		result = service.Translation.TransFor(key, nil, language.Make(a.Get(1).String()))
-	default:
-		hasLocale := true
-		args := make(map[string]interface{})
-		if a.NumOfArguments()%2 != 0 {
-			hasLocale = false
-		}
+			return true, nil
+		})
 
-		count := a.NumOfArguments()
-		if !hasLocale {
-			count--
-		}
-
-		for i := 1; i < count; i++ {
-			args[a.Get(i).String()] = a.Get(i + 1)
-			i++
-		}
-
-		if hasLocale {
-			result = service.Translation.TransFor(key, args, language.Make(a.Get(count-1).String()))
-		} else {
-			result = service.Translation.Trans(key, args)
+		if err != nil {
+			cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
 		}
 	}
 
-	return reflect.ValueOf(result)
+	return stick.Value(url.String())
+}
+
+func templateTransFunc(ctx stick.Context, args ...stick.Value) stick.Value {
+	for i := len(args); i < 3; i++ {
+		args = append(args, stick.Value(nil))
+	}
+
+	var values map[string]interface{}
+	key := stick.CoerceString(args[0])
+
+	var result string
+	if args[1] != nil && stick.IsMap(args[1]) {
+		values = make(map[string]interface{})
+		_, err := stick.Iterate(args[1], func(k, v stick.Value, l stick.Loop) (brk bool, err error) {
+			values[stick.CoerceString(k)] = stick.CoerceString(v)
+
+			return true, nil
+		})
+
+		if err != nil {
+			cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
+		}
+	}
+
+	if args[2] == nil {
+		result = service.Translation.Trans(key, values)
+	} else {
+		locale := stick.CoerceString(args[2])
+		result = service.Translation.TransFor(key, values, language.Make(locale))
+	}
+
+	return stick.Value(result)
 }
