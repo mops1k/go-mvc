@@ -53,7 +53,7 @@ func (bc *BaseController) Error(w http.ResponseWriter, err error, code int) {
 	http.Error(w, err.Error(), code)
 }
 
-func (bc *BaseController) NotFound(ctx *Context, err string) (string, error) {
+func (bc *BaseController) NotFound(err string, ctx *Context) (string, error) {
 	ctx.statusCode = http.StatusNotFound
 
 	return "", errors.New(err)
