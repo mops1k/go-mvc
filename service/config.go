@@ -3,6 +3,7 @@ package service
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -24,6 +25,7 @@ func init() {
 	Config.reader.SetConfigType("yaml")
 
 	dirName := "./config/"
+	_ = os.Mkdir(dirName, 0666)
 
 	files, err := ioutil.ReadDir(dirName)
 	if err != nil {
