@@ -1,6 +1,8 @@
 package http
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -38,6 +40,13 @@ func (bc *BaseController) Render(filename string, vars map[string]interface{}) s
 
 func (bc *BaseController) RenderString(content string, vars map[string]interface{}) string {
 	return service.Template.RenderString(content, vars)
+}
+
+func (bc *BaseController) RenderJson(c interface{}, ctx *Context) (string, error) {
+	ctx.Header("Content-Type", "application/json")
+	result, err := json.Marshal(c)
+
+	return bytes.NewBuffer(result).String(), err
 }
 
 func (bc *BaseController) Error(w http.ResponseWriter, err error, code int) {
