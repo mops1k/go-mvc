@@ -18,6 +18,10 @@ func NewParser() *Parser {
 }
 
 func (p *Parser) Parse(str string) {
+	if str == "" {
+		return
+	}
+
 	pattern, err := regexp.Compile(`([-]{1,2}[\w\d-]+)[\s|=]?([\s\w\d]*)`)
 	if err != nil {
 		panic(err)

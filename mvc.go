@@ -2,6 +2,7 @@ package mvc
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	netHttp "net/http"
@@ -46,6 +47,7 @@ func init() {
 
 func Run() {
 	appLog.Printf("Application has started at %s\n", srv)
+	flag.Parse()
 
 	go func() {
 		go func() {
@@ -59,15 +61,28 @@ func Run() {
 		cc.Add(&cmd.RoutingCommand{})
 		cc.Add(&cmd.HelpCommand{})
 
+		parser := command.NewParser()
+		go func() {
+			for _, flagCmd := range flag.Args() {
+				parser.Parse(flagCmd)
+				if cc.Has(parser.Ctx().Command()) {
+					cliCmd := cc.Get(parser.Ctx().Command())
+					cliCmd.Action(parser.Ctx())
+				} else {
+					appLog.Printf(`Unknown command "%s".`, parser.Ctx().Command())
+				}
+			}
+		}()
+
 		var c string
 		for {
 			color.Green.Print("> ")
 			_, _ = fmt.Scanln(&c)
-			parser := command.NewParser()
+
 			parser.Parse(c)
 			if cc.Has(parser.Ctx().Command()) {
-				c := cc.Get(parser.Ctx().Command())
-				c.Action(parser.Ctx())
+				cliCmd := cc.Get(parser.Ctx().Command())
+				cliCmd.Action(parser.Ctx())
 			} else {
 				appLog.Printf(`Unknown command "%s".`, parser.Ctx().Command())
 			}
