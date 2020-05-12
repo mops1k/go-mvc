@@ -31,7 +31,6 @@ func init() {
 	logo := figure.NewFigure("go-mvc", "isometric1", true)
 	color.Green.Println(logo.String())
 
-	cli.Logger.Set(cli.AppLog, log.New(os.Stdout, "[app] ", log.LstdFlags))
 	appLog = cli.Logger.Get(cli.AppLog).(*log.Logger)
 	srv = http.GetServer(
 		service.Config.GetString("server.host"),
