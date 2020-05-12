@@ -18,16 +18,30 @@ func NewParser() *Parser {
 }
 
 func (p *Parser) Parse(str string) {
+	p.ctx.command = ""
 	if str == "" {
 		return
 	}
 
-	pattern, err := regexp.Compile(`([-]{1,2}[\w\d-]+)[\s|=]?([\s\w\d]*)`)
+	pattern, err := regexp.Compile(`^([\w\d-]+)[\s]?.*`)
+	if err != nil {
+		panic(err)
+	}
+	matches := pattern.FindAllStringSubmatch(str, 1)
+
+	if len(matches) < 1 {
+		return
+	}
+
+	p.ctx.command = matches[0][1]
+	str = strings.Replace(str, matches[0][1], "", -1)
+
+	pattern, err = regexp.Compile(`([-]{1,2}[\w\d-]+)[\s|=]?([\s\w\d]*)`)
 	if err != nil {
 		panic(err)
 	}
 
-	matches := pattern.FindAllStringSubmatch(str, -1)
+	matches = pattern.FindAllStringSubmatch(str, -1)
 	for _, match := range matches {
 		name := match[1]
 		var value interface{}
@@ -41,15 +55,6 @@ func (p *Parser) Parse(str string) {
 		str = strings.Replace(str, match[1], "", -1)
 		str = strings.Replace(str, match[2], "", -1)
 	}
-
-	pattern, err = regexp.Compile(`^([\w\d-]+)[\s]?.*`)
-	if err != nil {
-		panic(err)
-	}
-	matches = pattern.FindAllStringSubmatch(str, 1)
-
-	p.ctx.command = matches[0][1]
-	str = strings.Replace(str, matches[0][1], "", -1)
 
 	pattern, err = regexp.Compile(`([\w\d-]+)?.*`)
 	if err != nil {

@@ -1,9 +1,9 @@
 package mvc
 
 import (
+	"bufio"
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	netHttp "net/http"
 	"os"
@@ -77,9 +77,10 @@ func Run() {
 		var c string
 		for {
 			color.Green.Print("> ")
-			_, _ = fmt.Scanln(&c)
+			reader := bufio.NewReader(os.Stdin)
+			c, _ = reader.ReadString('\n')
 
-			parser.Parse(c)
+			parser.Parse(c[:])
 			if cc.Has(parser.Ctx().Command()) {
 				cliCmd := cc.Get(parser.Ctx().Command())
 				cliCmd.Action(parser.Ctx())
