@@ -12,7 +12,7 @@ import (
 
 	"github.com/mops1k/go-mvc/cli"
 	"github.com/mops1k/go-mvc/service"
-	"github.com/mops1k/go-mvc/tools"
+	"github.com/mops1k/go-mvc/tools/array"
 )
 
 type Controller interface {
@@ -26,7 +26,7 @@ type BaseController struct {
 }
 
 type controllerCollection struct {
-	*tools.ArrayIterator
+	*array.Iterator
 	data []Controller
 }
 

@@ -1,10 +1,10 @@
-package tools
+package _map
 
 import (
 	"reflect"
 )
 
-type MapIterator struct {
+type Iterator struct {
 	data    map[interface{}]interface{}
 	current int
 	keys    []reflect.Value
@@ -12,8 +12,8 @@ type MapIterator struct {
 	count   int
 }
 
-func NewMapIterator(data map[interface{}]interface{}) *MapIterator {
-	iterator := &MapIterator{data: data, next: false, count: len(data)}
+func NewIterator(data map[interface{}]interface{}) *Iterator {
+	iterator := &Iterator{data: data, next: false, count: len(data)}
 	if iterator.count > 0 {
 		iterator.current = 0
 	}
@@ -21,7 +21,7 @@ func NewMapIterator(data map[interface{}]interface{}) *MapIterator {
 	return iterator
 }
 
-func (m *MapIterator) Current() interface{} {
+func (m *Iterator) Current() interface{} {
 	if m.keys == nil {
 		m.readKeys()
 	}
@@ -29,7 +29,7 @@ func (m *MapIterator) Current() interface{} {
 	return m.data[m.Key()]
 }
 
-func (m *MapIterator) Prev() bool {
+func (m *Iterator) Prev() bool {
 	if m.keys == nil {
 		m.readKeys()
 	}
@@ -42,7 +42,7 @@ func (m *MapIterator) Prev() bool {
 	return true
 }
 
-func (m *MapIterator) Next() bool {
+func (m *Iterator) Next() bool {
 	if m.keys == nil {
 		m.readKeys()
 	}
@@ -55,16 +55,16 @@ func (m *MapIterator) Next() bool {
 	return true
 }
 
-func (m *MapIterator) Count() int {
+func (m *Iterator) Count() int {
 	return len(m.data)
 }
 
-func (m *MapIterator) Key() interface{} {
+func (m *Iterator) Key() interface{} {
 	key := m.keys[m.current]
 
 	return key.Interface()
 }
 
-func (m *MapIterator) readKeys() {
+func (m *Iterator) readKeys() {
 	m.keys = reflect.ValueOf(m.data).MapKeys()
 }

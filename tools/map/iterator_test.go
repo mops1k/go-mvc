@@ -1,4 +1,4 @@
-package tools
+package _map
 
 import (
 	"testing"
@@ -15,7 +15,7 @@ var (
 		"test 5": "value 5",
 		"test 6": "value 6",
 	}
-	mapIterator = NewMapIterator(testMap)
+	mapIterator = NewIterator(testMap)
 )
 
 func TestMapIterator_Count(t *testing.T) {

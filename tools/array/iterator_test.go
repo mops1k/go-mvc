@@ -1,4 +1,4 @@
-package tools
+package array
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 
 var (
 	testArray = []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	i         = NewArrayIterator(testArray)
+	i         = NewIterator(testArray)
 )
 
 func TestArrayIterator_Count(t *testing.T) {

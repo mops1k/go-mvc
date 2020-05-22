@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/mops1k/go-mvc/service/command"
-	"github.com/mops1k/go-mvc/tools"
+	"github.com/mops1k/go-mvc/tools/map"
 )
 
 type Command interface {
@@ -12,7 +12,7 @@ type Command interface {
 }
 
 type CommandCollection struct {
-	*tools.MapIterator
+	*_map.Iterator
 	data map[string]Command
 }
 

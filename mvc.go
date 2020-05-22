@@ -112,7 +112,7 @@ func HttpMiddleware(middleware http.Middleware) {
 	srv.Middleware(middleware)
 }
 
-// Set custom http hanler
+// Update custom http hanler
 func HttpHandler(h netHttp.Handler) {
 	srv.SetHandler(h)
 }
