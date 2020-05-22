@@ -12,6 +12,7 @@ import (
 
 	"github.com/mops1k/go-mvc/cli"
 	"github.com/mops1k/go-mvc/service"
+	"github.com/mops1k/go-mvc/tools"
 )
 
 type Controller interface {
@@ -25,7 +26,8 @@ type BaseController struct {
 }
 
 type controllerCollection struct {
-	controllers []Controller
+	*tools.ArrayIterator
+	data []Controller
 }
 
 var Controllers *controllerCollection
@@ -69,13 +71,13 @@ func (bc *BaseController) GetManager(name interface{}) *gorm.DB {
 }
 
 func (cc *controllerCollection) Add(c Controller) *controllerCollection {
-	if !pgo.InArray(c, cc.controllers) {
-		cc.controllers = append(cc.controllers, c)
+	if !pgo.InArray(c, cc.data) {
+		cc.data = append(cc.data, c)
 	}
 
 	return cc
 }
 
 func (cc *controllerCollection) All() []Controller {
-	return cc.controllers
+	return cc.data
 }

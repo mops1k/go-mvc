@@ -27,8 +27,10 @@ func init() {
 }
 
 func (r *routing) HandleControllers() {
-	for _, controller := range Controllers.All() {
-		r.addController(controller)
+	for Controllers.Next() {
+		if controller, ok := Controllers.Current().(Controller); ok {
+			r.addController(controller)
+		}
 	}
 }
 

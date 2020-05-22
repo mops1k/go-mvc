@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/mops1k/go-mvc/service/command"
+	"github.com/mops1k/go-mvc/tools"
 )
 
 type Command interface {
@@ -11,7 +12,8 @@ type Command interface {
 }
 
 type CommandCollection struct {
-	collection map[string]Command
+	*tools.MapIterator
+	data map[string]Command
 }
 
 var Commands *CommandCollection
@@ -21,23 +23,23 @@ func init() {
 }
 
 func (cc *CommandCollection) Add(c Command) *CommandCollection {
-	if cc.collection == nil {
-		cc.collection = make(map[string]Command)
+	if cc.data == nil {
+		cc.data = make(map[string]Command)
 	}
 
-	cc.collection[c.Name()] = c
+	cc.data[c.Name()] = c
 
 	return cc
 }
 
 func (cc *CommandCollection) Get(name string) Command {
-	return cc.collection[name]
+	return cc.data[name]
 }
 
 func (cc *CommandCollection) GetAll() map[string]Command {
-	return cc.collection
+	return cc.data
 }
 
 func (cc *CommandCollection) Has(name string) bool {
-	return cc.collection[name] != nil
+	return cc.data[name] != nil
 }

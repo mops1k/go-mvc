@@ -27,6 +27,7 @@ var (
 	appLog *log.Logger
 )
 
+// init mvc
 func init() {
 	logo := figure.NewFigure("go-mvc", "isometric1", true)
 	color.Green.Println(logo.String())
@@ -44,6 +45,7 @@ func init() {
 	)
 }
 
+// Run mvc application
 func Run() {
 	appLog.Printf("Application has started at %s\n", srv)
 	flag.Parse()
@@ -105,10 +107,12 @@ func Run() {
 	appLog.Println("Application has stopped")
 }
 
+// Add middleware to http server
 func HttpMiddleware(middleware http.Middleware) {
 	srv.Middleware(middleware)
 }
 
+// Set custom http hanler
 func HttpHandler(h netHttp.Handler) {
 	srv.SetHandler(h)
 }

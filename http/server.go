@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+
+	"github.com/mops1k/go-mvc/cli"
 )
 
 type Server struct {
@@ -22,6 +24,7 @@ type Server struct {
 	handler     http.Handler
 }
 
+// Server constructor
 func GetServer(host string, port int, log *log.Logger) (s *Server) {
 	s = &Server{
 		port:     port,
@@ -29,7 +32,7 @@ func GetServer(host string, port int, log *log.Logger) (s *Server) {
 		timeouts: make(map[string]uint16),
 		logger:   log,
 		routing:  Routing,
-		handler:  handlers.RecoveryHandler()(Routing.mux),
+		handler:  handlers.RecoveryHandler(handlers.RecoveryLogger(cli.Logger.Get(cli.ErrorLog).(handlers.RecoveryHandlerLogger)))(Routing.mux),
 	}
 
 	s.Middleware(&LoggingMiddleware{})
@@ -37,6 +40,7 @@ func GetServer(host string, port int, log *log.Logger) (s *Server) {
 	return
 }
 
+// Start listening server
 func (s *Server) ListenAndServe() error {
 	s.routing.HandleControllers()
 	http.Handle("/", s.routing.mux)

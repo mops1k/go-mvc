@@ -25,14 +25,16 @@ func (h HelpCommand) Action(ctx command.Context) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Name", "Description"})
-	for _, cmd := range service.Commands.GetAll() {
-		if cmd.Name() == h.Name() {
-			continue
-		}
+	for service.Commands.Next() {
+		if cmd, ok := service.Commands.Current().(service.Command); ok {
+			if cmd.Name() == h.Name() {
+				continue
+			}
 
-		t.AppendRows([]table.Row{
-			{cmd.Name(), cmd.Description()},
-		})
+			t.AppendRows([]table.Row{
+				{cmd.Name(), cmd.Description()},
+			})
+		}
 	}
 
 	t.Render()
