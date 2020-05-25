@@ -127,3 +127,7 @@ func HttpMiddleware(middleware http.Middleware) {
 func HttpHandler(h netHttp.Handler) {
 	srv.SetHandler(h)
 }
+
+func SetCustomServerConfig(sc *appCfg.ServerConfig) {
+	srv.SetConfig(sc)
+}

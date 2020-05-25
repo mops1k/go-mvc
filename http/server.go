@@ -111,3 +111,11 @@ func (s *Server) getTimeout(name string) time.Duration {
 
 	return time.Duration(value) * time.Second
 }
+
+func (s *Server) RedirectToTLSHandler(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, fmt.Sprintf("%s%s", s, r.RequestURI), http.StatusMovedPermanently)
+}
+
+func (s *Server) SetConfig(sc *config.ServerConfig) {
+	s.config = sc
+}
