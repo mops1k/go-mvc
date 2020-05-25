@@ -19,7 +19,7 @@ var (
 )
 
 func TestMapIterator_Count(t *testing.T) {
-	assert.Equal(t, mapIterator.count, len(testMap))
+	assert.Equal(t, mapIterator.Count(), len(testMap))
 }
 
 func TestMapIterator(t *testing.T) {

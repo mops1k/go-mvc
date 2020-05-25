@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/arthurkushman/pgo"
 	"github.com/jinzhu/gorm"
 
 	"github.com/mops1k/go-mvc/cli"
@@ -26,9 +25,7 @@ type BaseController struct {
 }
 
 type controllerCollection struct {
-	array.Iterator
 	array.Collection
-	data []Controller
 }
 
 var Controllers *controllerCollection
@@ -72,9 +69,7 @@ func (bc *BaseController) GetManager(name interface{}) *gorm.DB {
 }
 
 func (cc *controllerCollection) Add(c Controller) *controllerCollection {
-	if !pgo.InArray(c, cc.data) {
-		cc.data = append(cc.data, c)
-	}
+	cc.Collection.Add(c)
 
 	return cc
 }

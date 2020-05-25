@@ -9,14 +9,10 @@ type Iterator struct {
 	current int
 	keys    []reflect.Value
 	next    interface{}
-	count   int
 }
 
 func NewIterator(data map[interface{}]interface{}) *Iterator {
-	iterator := &Iterator{data: data, next: false, count: len(data)}
-	if iterator.count > 0 {
-		iterator.current = 0
-	}
+	iterator := &Iterator{data: data}
 
 	return iterator
 }
@@ -47,7 +43,7 @@ func (m *Iterator) Next() bool {
 		m.readKeys()
 	}
 
-	if m.current+1 > m.count {
+	if m.current+1 > m.Count()-1 {
 		return false
 	}
 

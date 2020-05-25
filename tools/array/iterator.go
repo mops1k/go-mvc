@@ -1,23 +1,20 @@
 package array
 
 type Iterator struct {
-	data    []interface{}
+	Data    []interface{}
 	current int
 	next    interface{}
 	count   int
 }
 
 func NewIterator(data []interface{}) *Iterator {
-	iterator := &Iterator{data: data, next: false, count: len(data)}
-	if iterator.count > 0 {
-		iterator.current = 0
-	}
+	iterator := &Iterator{Data: data}
 
 	return iterator
 }
 
 func (a *Iterator) Current() interface{} {
-	return a.data[a.current]
+	return a.Data[a.current]
 }
 
 func (a *Iterator) Prev() bool {
@@ -30,7 +27,7 @@ func (a *Iterator) Prev() bool {
 }
 
 func (a *Iterator) Next() bool {
-	if a.current+1 > a.count {
+	if a.current+1 > a.Count() {
 		return false
 	}
 
@@ -39,7 +36,7 @@ func (a *Iterator) Next() bool {
 }
 
 func (a *Iterator) Count() int {
-	return len(a.data)
+	return len(a.Data)
 }
 
 func (a *Iterator) Key() int {

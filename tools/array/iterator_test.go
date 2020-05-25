@@ -12,7 +12,7 @@ var (
 )
 
 func TestArrayIterator_Count(t *testing.T) {
-	assert.Equal(t, i.count, len(testArray))
+	assert.Equal(t, i.Count(), len(testArray))
 }
 
 func TestArrayIterator(t *testing.T) {

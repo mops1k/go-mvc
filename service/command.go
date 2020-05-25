@@ -1,6 +1,9 @@
 package service
 
 import (
+	"log"
+
+	"github.com/mops1k/go-mvc/cli"
 	"github.com/mops1k/go-mvc/service/command"
 	"github.com/mops1k/go-mvc/tools/map"
 )
@@ -12,9 +15,7 @@ type Command interface {
 }
 
 type CommandCollection struct {
-	_map.Iterator
 	_map.Collection
-	data map[string]Command
 }
 
 var Commands *CommandCollection
@@ -24,15 +25,19 @@ func init() {
 }
 
 func (cc *CommandCollection) Add(c Command) *CommandCollection {
-	if cc.data == nil {
-		cc.data = make(map[string]Command)
+	err := cc.Collection.Add(c.Name(), c)
+	if err != nil {
+		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic(err)
 	}
-
-	cc.data[c.Name()] = c
 
 	return cc
 }
 
 func (cc *CommandCollection) Get(name string) Command {
-	return cc.data[name]
+	value, err := cc.Collection.Get(name)
+	if err != nil {
+		cli.Logger.Get(cli.AppLog).(*log.Logger).Panic("command does not exists")
+	}
+
+	return value.(Command)
 }

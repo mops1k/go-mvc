@@ -45,3 +45,7 @@ func (a *Collection) List() []interface{} {
 func (a *Collection) Exists(index int) bool {
 	return !(index >= len(a.data) || index < 0)
 }
+
+func (a *Collection) CreateIterator() *Iterator {
+	return NewIterator(a.List())
+}
