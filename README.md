@@ -29,6 +29,9 @@ server:
         read:  10
         write: 15
         idle:  30
+    tls:
+        key_file: ~
+        cert_file: ~
 
 database:
   default:
