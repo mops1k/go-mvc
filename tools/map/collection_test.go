@@ -15,7 +15,7 @@ var (
 		"test 5": "value 5",
 		"test 6": "value 6",
 	}
-	mapCollection = Collection{collection: mcMap}
+	mapCollection = Collection{data: mcMap}
 )
 
 func TestArrayCollection_Add_List(t *testing.T) {

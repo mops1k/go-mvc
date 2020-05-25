@@ -27,6 +27,7 @@ type BaseController struct {
 
 type controllerCollection struct {
 	*array.Iterator
+	*array.Collection
 	data []Controller
 }
 
@@ -76,8 +77,4 @@ func (cc *controllerCollection) Add(c Controller) *controllerCollection {
 	}
 
 	return cc
-}
-
-func (cc *controllerCollection) All() []Controller {
-	return cc.data
 }

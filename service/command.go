@@ -13,6 +13,7 @@ type Command interface {
 
 type CommandCollection struct {
 	*_map.Iterator
+	*_map.Collection
 	data map[string]Command
 }
 
@@ -34,12 +35,4 @@ func (cc *CommandCollection) Add(c Command) *CommandCollection {
 
 func (cc *CommandCollection) Get(name string) Command {
 	return cc.data[name]
-}
-
-func (cc *CommandCollection) GetAll() map[string]Command {
-	return cc.data
-}
-
-func (cc *CommandCollection) Has(name string) bool {
-	return cc.data[name] != nil
 }

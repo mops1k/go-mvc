@@ -66,7 +66,7 @@ func Run() {
 		go func() {
 			for _, flagCmd := range flag.Args() {
 				parser.Parse(flagCmd)
-				if cc.Has(parser.Ctx().Command()) {
+				if cc.Exists(parser.Ctx().Command()) {
 					cliCmd := cc.Get(parser.Ctx().Command())
 					cliCmd.Action(parser.Ctx())
 				} else {
@@ -82,7 +82,7 @@ func Run() {
 			c, _ = reader.ReadString('\n')
 
 			parser.Parse(c[:])
-			if cc.Has(parser.Ctx().Command()) {
+			if cc.Exists(parser.Ctx().Command()) {
 				cliCmd := cc.Get(parser.Ctx().Command())
 				cliCmd.Action(parser.Ctx())
 			} else {

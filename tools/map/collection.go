@@ -5,11 +5,11 @@ import (
 )
 
 type Collection struct {
-	collection map[interface{}]interface{}
+	data map[interface{}]interface{}
 }
 
 func (m *Collection) Exists(key interface{}) bool {
-	if _, exists := m.collection[key]; !exists {
+	if _, exists := m.data[key]; !exists {
 		return false
 	}
 
@@ -21,7 +21,7 @@ func (m *Collection) Get(key interface{}) (interface{}, error) {
 		return nil, fmt.Errorf(`key "%s" does not exists`, key)
 	}
 
-	return m.collection[key], nil
+	return m.data[key], nil
 }
 
 func (m *Collection) Add(key interface{}, value interface{}) error {
@@ -29,7 +29,7 @@ func (m *Collection) Add(key interface{}, value interface{}) error {
 		return fmt.Errorf(`key "%s" already exists`, key)
 	}
 
-	m.collection[key] = value
+	m.data[key] = value
 
 	return nil
 }
@@ -39,7 +39,7 @@ func (m *Collection) Update(key interface{}, value interface{}) error {
 		return fmt.Errorf(`key "%s" does not exists`, key)
 	}
 
-	m.collection[key] = value
+	m.data[key] = value
 
 	return nil
 }
@@ -49,11 +49,11 @@ func (m *Collection) Remove(key interface{}) error {
 		return fmt.Errorf(`key "%s" does not exists`, key)
 	}
 
-	delete(m.collection, key)
+	delete(m.data, key)
 
 	return nil
 }
 
 func (m *Collection) List() map[interface{}]interface{} {
-	return m.collection
+	return m.data
 }

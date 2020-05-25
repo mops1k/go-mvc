@@ -8,7 +8,7 @@ import (
 
 var (
 	acTest          = []interface{}{1, 2, 3, 4, 5, 6, 7, 8}
-	arrayCollection = Collection{collection: acTest}
+	arrayCollection = Collection{data: acTest}
 )
 
 func TestArrayCollection_Add_List(t *testing.T) {
