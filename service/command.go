@@ -12,8 +12,8 @@ type Command interface {
 }
 
 type CommandCollection struct {
-	*_map.Iterator
-	*_map.Collection
+	_map.Iterator
+	_map.Collection
 	data map[string]Command
 }
 

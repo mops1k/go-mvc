@@ -26,8 +26,8 @@ type BaseController struct {
 }
 
 type controllerCollection struct {
-	*array.Iterator
-	*array.Collection
+	array.Iterator
+	array.Collection
 	data []Controller
 }
 
