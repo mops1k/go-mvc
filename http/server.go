@@ -11,12 +11,11 @@ import (
 	"github.com/gorilla/handlers"
 
 	"github.com/mops1k/go-mvc/cli"
+	"github.com/mops1k/go-mvc/config"
 )
 
 type Server struct {
-	port        int
-	host        string
-	timeouts    map[string]uint16
+	config      *config.ServerConfig
 	srv         *http.Server
 	middlewares []Middleware
 	logger      *log.Logger
@@ -25,14 +24,12 @@ type Server struct {
 }
 
 // Server constructor
-func GetServer(host string, port int, log *log.Logger) (s *Server) {
+func GetServer(config *config.ServerConfig, log *log.Logger) (s *Server) {
 	s = &Server{
-		port:     port,
-		host:     host,
-		timeouts: make(map[string]uint16),
-		logger:   log,
-		routing:  Routing,
-		handler:  handlers.RecoveryHandler(handlers.RecoveryLogger(cli.Logger.Get(cli.ErrorLog).(handlers.RecoveryHandlerLogger)))(Routing.mux),
+		config:  config,
+		logger:  log,
+		routing: Routing,
+		handler: handlers.RecoveryHandler(handlers.RecoveryLogger(cli.Logger.Get(cli.ErrorLog).(handlers.RecoveryHandlerLogger)))(Routing.mux),
 	}
 
 	s.Middleware(&LoggingMiddleware{})
@@ -49,7 +46,7 @@ func (s *Server) ListenAndServe() error {
 	}
 
 	s.srv = &http.Server{
-		Addr:         fmt.Sprintf("%s:%d", s.host, s.port),
+		Addr:         fmt.Sprintf("%s:%d", s.config.Host, s.config.Port),
 		Handler:      s.handler,
 		ReadTimeout:  s.getTimeout("read"),
 		WriteTimeout: s.getTimeout("write"),
@@ -62,6 +59,15 @@ func (s *Server) ListenAndServe() error {
 		panic(err)
 	}
 
+	if s.config.CertFile != "" && s.config.KeyFile != "" {
+		err := s.config.CheckTlsFiles()
+		if err != nil {
+			cli.Logger.Get(cli.ErrorLog).(*log.Logger).Panic(err)
+		}
+
+		return s.srv.ServeTLS(l, s.config.CertFile, s.config.KeyFile)
+	}
+
 	return s.srv.Serve(l)
 }
 
@@ -72,9 +78,9 @@ func (s *Server) Middleware(middleware Middleware) *Server {
 }
 
 func (s *Server) SetTimeouts(read uint16, write uint16, idle uint16) *Server {
-	s.timeouts["read"] = read
-	s.timeouts["write"] = write
-	s.timeouts["idle"] = idle
+	s.config.Timeouts["read"] = read
+	s.config.Timeouts["write"] = write
+	s.config.Timeouts["idle"] = idle
 
 	return s
 }
@@ -90,11 +96,15 @@ func (s *Server) SetHandler(h http.Handler) *Server {
 }
 
 func (s *Server) String() string {
-	return fmt.Sprintf("http://%s:%d", s.host, s.port)
+	protocol := "http"
+	if s.config.CertFile != "" && s.config.KeyFile != "" {
+		protocol = "https"
+	}
+	return fmt.Sprintf("%s://%s:%d", protocol, s.config.Host, s.config.Port)
 }
 
 func (s *Server) getTimeout(name string) time.Duration {
-	value, exists := s.timeouts[name]
+	value, exists := s.config.Timeouts[name]
 	if !exists {
 		return 0
 	}

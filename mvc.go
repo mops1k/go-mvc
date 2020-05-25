@@ -17,6 +17,7 @@ import (
 
 	"github.com/mops1k/go-mvc/cli"
 	cmd "github.com/mops1k/go-mvc/cli/command"
+	appCfg "github.com/mops1k/go-mvc/config"
 	"github.com/mops1k/go-mvc/http"
 	"github.com/mops1k/go-mvc/service"
 	"github.com/mops1k/go-mvc/service/command"
@@ -25,6 +26,7 @@ import (
 var (
 	srv    *http.Server
 	appLog *log.Logger
+	config *appCfg.ServerConfig
 )
 
 // init mvc
@@ -33,11 +35,20 @@ func init() {
 	color.Green.Println(logo.String())
 
 	appLog = cli.Logger.Get(cli.AppLog).(*log.Logger)
+
+	config = &appCfg.ServerConfig{
+		Port:     service.Config.GetInt("server.port"),
+		Host:     service.Config.GetString("server.host"),
+		CertFile: service.Config.GetString("server.tls.cert_file"),
+		KeyFile:  service.Config.GetString("server.tls.key_file"),
+		Timeouts: make(map[string]uint16),
+	}
+
 	srv = http.GetServer(
-		service.Config.GetString("server.host"),
-		service.Config.GetInt("server.port"),
+		config,
 		cli.Logger.Get(cli.ErrorLog).(*log.Logger),
 	)
+
 	srv.SetTimeouts(
 		cast.ToUint16(service.Config.GetInt("server.timeout.read")),
 		cast.ToUint16(service.Config.GetInt("server.timeout.write")),
