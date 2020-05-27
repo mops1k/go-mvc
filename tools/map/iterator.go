@@ -8,7 +8,6 @@ type Iterator struct {
 	data    map[interface{}]interface{}
 	current int
 	keys    []reflect.Value
-	next    interface{}
 }
 
 func NewIterator(data map[interface{}]interface{}) *Iterator {

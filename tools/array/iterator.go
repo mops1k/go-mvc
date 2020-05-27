@@ -3,8 +3,6 @@ package array
 type Iterator struct {
 	Data    []interface{}
 	current int
-	next    interface{}
-	count   int
 }
 
 func NewIterator(data []interface{}) *Iterator {

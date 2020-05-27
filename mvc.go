@@ -128,6 +128,7 @@ func HttpHandler(h netHttp.Handler) {
 	srv.SetHandler(h)
 }
 
+// Set custom server configuration via code
 func SetCustomServerConfig(sc *appCfg.ServerConfig) {
 	srv.SetConfig(sc)
 }

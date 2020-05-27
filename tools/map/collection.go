@@ -6,8 +6,7 @@ import (
 
 // Iterable collection struct
 type Collection struct {
-	data     map[interface{}]interface{}
-	iterator *Iterator
+	data map[interface{}]interface{}
 }
 
 // check if value is exists
